@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="feature/RTF-49" author="Nischal">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="users_pkey"/>
+            </column>
+            <column name="email" type="VARCHAR">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="TIMESTAMP" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_on" type="TIMESTAMP" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_seen" type="TIMESTAMP" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_login_ip_address" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="verified_user" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="avatar" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_of_birth" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

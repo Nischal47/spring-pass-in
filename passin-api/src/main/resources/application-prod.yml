@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: prod
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}/${DATABASE}
+    username: ${USERNAME}
+    password: ${PASSWORD}
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/master.xml
+client:
+  url: ${APP_URL}
+jwt:
+  secret: ${JWT_SECRET}
+  token-validity: ${TOKEN_VALIDITY_IN_MILLISECOND}

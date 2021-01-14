@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: @db.url@
+    username: @db.username@
+    password: @db.password@
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/master.xml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      dialect: org.hibernate.dialect.PostgreSQL10Dialect
+client:
+  url: http://localhost:4200
+jwt:
+  secret: abcd1234
+  token-validity: 4800000
