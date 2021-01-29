@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rightfind
+    name: passin
   servlet:
     multipart:
       enabled: true
