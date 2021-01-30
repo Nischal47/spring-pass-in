@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Qualifier(value = "userRepository")
 public interface UserRepository extends BaseRepository<User> {
-    @Query("SELECT u FROM User u WHERE u.email = : email")
+    @Query("SELECT u FROM User u WHERE u.email = :email")
     User getUserByEmail(@Param("email") String email);
 
     boolean existsUsersByEmail(String email);

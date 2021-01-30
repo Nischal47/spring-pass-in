@@ -1,7 +1,6 @@
 package com.example.passin.domain.user;
 
 import com.example.base.BaseEntity;
-import liquibase.pro.packaged.C;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 @Entity
