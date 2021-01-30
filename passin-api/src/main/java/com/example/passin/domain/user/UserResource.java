@@ -42,11 +42,11 @@ public class UserResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<SignUpResponseDto> registerUser(@RequestBody RegisterDto registerInfo){
-        if(registerInfo.getEmail().length() == 0 || registerInfo.getPassword().length() == 0 ){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SignUpResponseDto("Failed","Email and password are mandatory!",HttpStatus.BAD_REQUEST));
+    public ResponseEntity<SignUpResponseDto> registerUser(@RequestBody RegisterDto registerInfo) {
+        if (registerInfo.getEmail().length() == 0 || registerInfo.getPassword().length() == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SignUpResponseDto("Failed", "Email and password are mandatory!", HttpStatus.BAD_REQUEST));
         }
-        if(!userExist(registerInfo.getEmail())){
+        if (!userExist(registerInfo.getEmail())) {
             User newUser = new User();
             newUser.setEmail(registerInfo.getEmail());
             newUser.setPassword(passwordEncoder.encode(registerInfo.getPassword()));
@@ -54,8 +54,8 @@ public class UserResource {
             newUser.setLastName(registerInfo.getLastName());
             newUser.setDateOfBirth(registerInfo.getDateOfBirth());
             User addedUser = addNewUser(newUser);
-            if(addedUser.getId() > 0){
-                return ResponseEntity.status(HttpStatus.OK).body(new SignUpResponseDto("Success","Registration Successful",HttpStatus.OK));
+            if (addedUser.getId() > 0) {
+                return ResponseEntity.status(HttpStatus.OK).body(new SignUpResponseDto("Success", "Registration Successful", HttpStatus.OK));
             }
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignUpResponseDto("Failed", "Account Already Exists!", HttpStatus.CONFLICT));
@@ -87,7 +87,7 @@ public class UserResource {
         if (response != null) {
             return ResponseEntity.ok().body(new TokenValidationResponse(response, "Token is valid"));
         }
-        return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!"));
+        return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
     }
 
     private ValidTokenDtoResponse validTokenResponse(String token) {
