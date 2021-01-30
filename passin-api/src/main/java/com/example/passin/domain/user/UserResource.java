@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -33,6 +33,7 @@ public class UserResource {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    @Inject
     public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, UserService userService, UserMapper userMapper) {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
