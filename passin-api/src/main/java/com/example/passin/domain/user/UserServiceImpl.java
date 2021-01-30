@@ -17,10 +17,10 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     }
 
     @Override
-    public boolean validateUser(AuthDto authDto) {
-        User user = userRepository.getUserByEmail(authDto.getEmail());
+    public boolean validateUser(LoginDto loginDto) {
+        User user = userRepository.getUserByEmail(loginDto.getEmail());
         if (user != null) {
-            return passwordEncoder.matches(authDto.getPassword(), user.getPassword());
+            return passwordEncoder.matches(loginDto.getPassword(), user.getPassword());
         }
         return false;
     }

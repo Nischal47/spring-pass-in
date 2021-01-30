@@ -53,8 +53,11 @@
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="password_pkey"/>
             </column>
-            <column name="email" type="VARCHAR">
+            <column name="host_name" type="VARCHAR">
                 <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR">
+                <constraints nullable="false"/>
             </column>
             <column name="password" type="VARCHAR">
                 <constraints nullable="false"/>
@@ -63,9 +66,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="updated_on" type="TIMESTAMP" defaultValue="now()">
-                <constraints nullable="false"/>
-            </column>
-            <column name="account_status" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="bigint">

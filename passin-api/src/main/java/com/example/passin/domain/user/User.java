@@ -1,7 +1,6 @@
 package com.example.passin.domain.user;
 
 import com.example.base.BaseEntity;
-import liquibase.pro.packaged.C;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 @Entity
@@ -20,38 +18,38 @@ import java.sql.Timestamp;
 public class User extends BaseEntity {
 
     @Column(name = "email", unique = true)
-    public String email;
+    private String email;
 
     @Column(name = "password")
-    public String password;
+    private String password;
 
     @Column(name = "created_on")
-    public Timestamp createdOn;
+    private Timestamp createdOn;
 
     @Column(name = "updated_on")
-    public Timestamp updatedOn;
+    private Timestamp updatedOn;
 
     @Column(name = "account_status")
-    public Boolean accountStatus;
+    private Boolean accountStatus;
 
     @Column(name = "last_seen")
-    public Timestamp lastSeen;
+    private Timestamp lastSeen;
 
     @Column(name = "last_login_ip_address")
-    public String lastLoginIpAddress;
+    private String lastLoginIpAddress;
 
     @Column(name = "verified_user")
-    public Boolean verifiedUser;
+    private Boolean verifiedUser;
 
     @Column(name = "first_name")
-    public String firstName;
+    private String firstName;
 
     @Column(name = "last_name")
-    public String lastName;
+    private String lastName;
 
     @Column(name = "avatar")
-    public String avatar;
+    private String avatar;
 
     @Column(name = "date_of_birth")
-    public Timestamp dateOfBirth;
+    private Timestamp dateOfBirth;
 }
