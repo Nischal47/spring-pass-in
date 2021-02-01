@@ -46,9 +46,9 @@ public class PasswordResource {
     }
 
     @GetMapping("/get-passwords")
-    public List<Password> getAllPassword(@RequestParam(name = "user-id") long id){
-        return passwordService.findPasswordByUserId(id);
-//        return ResponseEntity.ok().body(new GetPasswordResponse(passwordList,"Password Retrieved Successfully", HttpStatus.OK));
+    public ResponseEntity<GetPasswordResponse> getAllPassword(@RequestParam(name = "user-id") long id){
+        List<Password> passwordList = passwordService.findPasswordByUserId(id);
+        return ResponseEntity.ok().body(new GetPasswordResponse(passwordList,"Password Retrieved Successfully", HttpStatus.OK));
     }
 
     private Password addNewPassword(Password password) {

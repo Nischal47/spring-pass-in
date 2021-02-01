@@ -2,8 +2,12 @@ package com.example.passin.message;
 
 import java.util.List;
 import com.example.passin.domain.password.Password;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+@Getter
+@Setter
 public class GetPasswordResponse {
     private List<Password> passwordList;
     private String message;
@@ -14,4 +18,5 @@ public class GetPasswordResponse {
         this.message = message;
         this.httpStatus = httpStatus;
     }
+
 }

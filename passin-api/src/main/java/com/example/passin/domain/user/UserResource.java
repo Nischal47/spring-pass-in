@@ -49,7 +49,7 @@ public class UserResource {
         if (!userExist(registerInfo.getEmail())) {
             User newUser = new User();
             newUser.setEmail(registerInfo.getEmail());
-            newUser.setPassword(passwordEncoder.encode(registerInfo.getPassword()));
+            newUser.setPassword(passwordEncoder.encode(registerInfo.getEmail() + registerInfo.getPassword()));
             newUser.setFirstName(registerInfo.getFirstName());
             newUser.setLastName(registerInfo.getLastName());
             newUser.setDateOfBirth(registerInfo.getDateOfBirth());
