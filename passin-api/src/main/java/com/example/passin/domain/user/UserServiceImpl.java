@@ -20,7 +20,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     public boolean validateUser(LoginDto loginDto) {
         User user = userRepository.getUserByEmail(loginDto.getEmail());
         if (user != null) {
-            return passwordEncoder.matches(loginDto.getPassword(), user.getPassword());
+            return passwordEncoder.matches(loginDto.getEmail() + loginDto.getPassword(), user.getPassword());
         }
         return false;
     }
