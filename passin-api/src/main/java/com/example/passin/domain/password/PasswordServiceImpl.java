@@ -1,16 +1,23 @@
 package com.example.passin.domain.password;
 
-import com.example.base.BaseRepository;
 import com.example.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Service
 public class PasswordServiceImpl extends BaseServiceImpl<Password> implements PasswordService{
+    PasswordRepository passwordRepository;
 
     @Inject
-    public PasswordServiceImpl(BaseRepository<Password> repository) {
-        super(repository);
+    public PasswordServiceImpl(PasswordRepository passwordRepository) {
+        super(passwordRepository);
+        this.passwordRepository = passwordRepository;
+    }
+
+    @Override
+    public List<Password> findPasswordByUserId(long id) {
+        return passwordRepository.findPasswordByUserId(id);
     }
 }
