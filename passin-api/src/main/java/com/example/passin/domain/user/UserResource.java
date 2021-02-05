@@ -7,7 +7,7 @@ import com.example.passin.message.ResponseUserDto;
 import com.example.passin.message.SignUpResponseDto;
 import com.example.passin.message.TokenValidationResponse;
 import com.example.passin.message.ValidTokenDtoResponse;
-import com.example.passin.security.JwtTokenUtil;
+import com.example.passin.security.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +29,12 @@ public class UserResource {
     public static final String USER_RESOURCE_URL = "/users";
 
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final UserService userService;
     private final UserMapper userMapper;
 
     @Inject
-    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, UserService userService, UserMapper userMapper) {
+    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper) {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userService = userService;
