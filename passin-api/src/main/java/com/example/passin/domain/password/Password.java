@@ -23,6 +23,9 @@ public class Password extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "iv")
+    private byte[] iv;
+
     @Column(name = "created_on")
     private Timestamp createdOn;
 

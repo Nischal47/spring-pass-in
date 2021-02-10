@@ -12,5 +12,8 @@ public interface UserRepository extends BaseRepository<User> {
     @Query("SELECT u FROM User u WHERE u.email = :email")
     User getUserByEmail(@Param("email") String email);
 
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    User getUserById(@Param("id") long id);
+
     boolean existsUsersByEmail(String email);
 }

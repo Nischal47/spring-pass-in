@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -22,6 +23,12 @@ public class User extends BaseEntity {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "master_password")
+    private byte[] masterPassword;
+
+    @Column(name = "iv")
+    private byte[] iv;
 
     @Column(name = "created_on")
     private Timestamp createdOn;
@@ -52,4 +59,14 @@ public class User extends BaseEntity {
 
     @Column(name = "date_of_birth")
     private Timestamp dateOfBirth;
+    @Id
+    private Long id;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

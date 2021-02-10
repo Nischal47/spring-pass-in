@@ -16,6 +16,12 @@
             <column name="password" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
+            <column name="master_password" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iv" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_on" type="TIMESTAMP" defaultValue="now()">
                 <constraints nullable="false"/>
             </column>
@@ -60,6 +66,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="password" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iv" type="BYTEA">
                 <constraints nullable="false"/>
             </column>
             <column name="created_on" type="TIMESTAMP" defaultValue="now()">

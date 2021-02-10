@@ -1,6 +1,8 @@
 package com.example.passin.domain.user;
 
 import com.example.base.BaseResource;
+import com.example.passin.encryption.Aes;
+import com.example.passin.encryption.AesEncryptResponse;
 import com.example.passin.message.LoginResponseDto;
 import com.example.passin.message.ResponseMessage;
 import com.example.passin.message.ResponseUserDto;
@@ -20,7 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 @RestController
 @Slf4j
@@ -32,27 +37,34 @@ public class UserResource {
     private final JwtTokenUtils jwtTokenUtil;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final Aes aes;
 
     @Inject
-    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper) {
+    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper,Aes aes) {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userService = userService;
         this.userMapper = userMapper;
+        this.aes = aes;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<SignUpResponseDto> registerUser(@RequestBody RegisterDto registerInfo) {
+    public ResponseEntity<SignUpResponseDto> registerUser(@RequestBody RegisterDto registerInfo) throws Exception {
         if (registerInfo.getEmail().length() == 0 || registerInfo.getPassword().length() == 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SignUpResponseDto("Failed", "Email and password are mandatory!", HttpStatus.BAD_REQUEST));
         }
         if (!userExist(registerInfo.getEmail())) {
+            byte[] randomMasterPassword = generateRandomMasterPassword();
+            System.out.println("Unencrypted"+Arrays.toString(randomMasterPassword));
+            AesEncryptResponse aesEncryptResponse = aes.encrypt(randomMasterPassword,"Kiodaija123".getBytes(StandardCharsets.US_ASCII));
             User newUser = new User();
             newUser.setEmail(registerInfo.getEmail());
             newUser.setPassword(passwordEncoder.encode(registerInfo.getEmail() + registerInfo.getPassword()));
             newUser.setFirstName(registerInfo.getFirstName());
             newUser.setLastName(registerInfo.getLastName());
             newUser.setDateOfBirth(registerInfo.getDateOfBirth());
+            newUser.setMasterPassword(aesEncryptResponse.getCipherText());
+            newUser.setIv(aesEncryptResponse.getIv());
             User addedUser = addNewUser(newUser);
             if (addedUser.getId() > 0) {
                 return ResponseEntity.status(HttpStatus.OK).body(new SignUpResponseDto("Success", "Registration Successful", HttpStatus.OK));
@@ -82,7 +94,6 @@ public class UserResource {
 
     @GetMapping("/token-validate")
     public ResponseEntity<?> validateToken(@RequestParam(name = "token") String token) {
-        System.out.println(token);
         ValidTokenDtoResponse response = validTokenResponse(token);
         if (response != null) {
             return ResponseEntity.ok().body(new TokenValidationResponse(response, "Token is valid"));
@@ -115,5 +126,12 @@ public class UserResource {
         user.setLastSeen(currentTimestamp);
         user.setVerifiedUser(false);
         return userService.save(user);
+    }
+
+    public byte[] generateRandomMasterPassword(){
+        byte[] randomMasterPassword = new byte[32];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(randomMasterPassword);
+        return randomMasterPassword;
     }
 }

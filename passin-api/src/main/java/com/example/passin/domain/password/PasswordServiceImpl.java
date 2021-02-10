@@ -20,4 +20,9 @@ public class PasswordServiceImpl extends BaseServiceImpl<Password> implements Pa
     public List<Password> findPasswordByUserId(long id) {
         return passwordRepository.findPasswordByUserId(id);
     }
+
+    @Override
+    public Password findPasswordById(long id) {
+        return passwordRepository.findPasswordById(id);
+    }
 }

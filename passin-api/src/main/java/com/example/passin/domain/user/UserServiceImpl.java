@@ -35,4 +35,10 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         return userRepository.getUserByEmail(email);
     }
 
+    @Override
+    public User getUserById(long id) {
+        User user = userRepository.getUserById(id);
+        return user;
+    }
+
 }

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PasswordService extends BaseService<Password> {
     List<Password> findPasswordByUserId(long id);
+    Password findPasswordById(long id);
 }
