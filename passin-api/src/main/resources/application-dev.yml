@@ -18,4 +18,4 @@ client:
   url: http://localhost:4200
 jwt:
   secret: abcd1234
-  token-validity: 4800000
+  token-validity: 300000
