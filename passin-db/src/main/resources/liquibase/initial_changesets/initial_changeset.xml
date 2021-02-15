@@ -52,6 +52,9 @@
             <column name="date_of_birth" type="TIMESTAMP">
                 <constraints nullable="true"/>
             </column>
+            <column name="refresh_token" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="password" author="Nischal">
@@ -60,7 +63,7 @@
                 <constraints primaryKey="true" primaryKeyName="password_pkey"/>
             </column>
             <column name="host_name" type="VARCHAR">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
             </column>
             <column name="email" type="VARCHAR">
                 <constraints nullable="false"/>
