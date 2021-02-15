@@ -59,6 +59,10 @@ public class User extends BaseEntity {
 
     @Column(name = "date_of_birth")
     private Timestamp dateOfBirth;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @Id
     private Long id;
 

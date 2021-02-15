@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.security.NoSuchAlgorithmException;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -21,7 +23,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 
-    public WebSecurityConfiguration(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+    public WebSecurityConfiguration(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws NoSuchAlgorithmException {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 

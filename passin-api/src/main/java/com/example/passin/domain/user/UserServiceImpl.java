@@ -40,5 +40,4 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         User user = userRepository.getUserById(id);
         return user;
     }
-
 }

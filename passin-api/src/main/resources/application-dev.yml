@@ -19,3 +19,4 @@ client:
 jwt:
   secret: abcd1234
   token-validity: 300000
+  refresh-token-validity: 900000

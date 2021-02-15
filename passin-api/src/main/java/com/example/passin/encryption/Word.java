@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Word {
-    private byte[] word = null;
+    private byte[] word;
     private AesUtils aesUtils = new AesUtils();
 
     public Word() {

@@ -28,6 +28,9 @@ public class JwtTokenUtils {
     @Value("${jwt.token-validity}")
     private String tokenValidity;
 
+    @Value("${jwt.refresh-token-validity}")
+    private String refreshTokenValidity;
+
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
@@ -51,13 +54,19 @@ public class JwtTokenUtils {
         return expiration.before(new Date());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email,long id) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, email);
+        claims.put("userId",id);
+        return doGenerateToken(claims, email,tokenValidity);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(String email,long id) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId",id);
+        return doGenerateToken(claims, email,refreshTokenValidity);
+    }
 
+    private String doGenerateToken(Map<String, Object> claims, String subject,String tokenValidity) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(tokenValidity))).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
