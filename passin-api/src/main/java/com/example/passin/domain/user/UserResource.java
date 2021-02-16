@@ -5,12 +5,13 @@ import com.example.passin.encryption.Aes;
 import com.example.passin.encryption.AesEncryptResponse;
 import com.example.passin.encryption.ShaHash;
 import com.example.passin.message.LoginResponseDto;
+import com.example.passin.message.LogoutResponseDto;
+import com.example.passin.message.RefreshTokenResponseDto;
 import com.example.passin.message.ResponseMessage;
 import com.example.passin.message.ResponseUserDto;
 import com.example.passin.message.SignUpResponseDto;
 import com.example.passin.message.TokenValidationResponse;
 import com.example.passin.message.ValidTokenDtoResponse;
-import com.example.passin.security.JwtRequestFilter;
 import com.example.passin.security.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,17 +41,15 @@ public class UserResource {
     private final UserMapper userMapper;
     private final Aes aes;
     private final ShaHash shaHash;
-    private final JwtRequestFilter jwtRequestFilter;
 
     @Inject
-    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper, Aes aes, ShaHash shaHash, JwtRequestFilter jwtRequestFilter) {
+    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper, Aes aes, ShaHash shaHash) {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userService = userService;
         this.userMapper = userMapper;
         this.aes = aes;
         this.shaHash = shaHash;
-        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @PostMapping("/register")
@@ -109,6 +109,31 @@ public class UserResource {
             return ResponseEntity.ok().body(new TokenValidationResponse(response, "Token is valid"));
         }
         return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
+    }
+
+    @GetMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDto refreshTokenDto){
+        boolean isValidRefreshToken = userService.validateRefreshToken(refreshTokenDto);
+        if(isValidRefreshToken){
+            User user = userService.findByEmail(refreshTokenDto.getEmail());
+            final String refreshToken = jwtTokenUtil.generateToken(refreshTokenDto.getEmail(),user.getId());
+            updateRefreshToken(refreshToken,user.getId());
+            return ResponseEntity.ok().body(new RefreshTokenResponseDto(HttpStatus.OK,refreshToken));
+        }
+        return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
+    }
+
+    @PutMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutDto logoutDto){
+        System.out.println(logoutDto.getEmail());
+        boolean isUser = userService.existByEmail(logoutDto.getEmail());
+        System.out.println(isUser);
+        if(isUser){
+            User user = userService.findByEmail(logoutDto.getEmail());
+            updateRefreshToken("",user.getId());
+            return ResponseEntity.status(HttpStatus.OK).body(new LogoutResponseDto( "Logout Successful", HttpStatus.OK));
+        }
+        return ResponseEntity.badRequest().body(new ResponseMessage("Logout Failed", HttpStatus.BAD_REQUEST));
     }
 
     private ValidTokenDtoResponse validTokenResponse(String token) {

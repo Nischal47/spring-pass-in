@@ -26,6 +26,17 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     }
 
     @Override
+    public boolean validateRefreshToken(RefreshTokenDto refreshToken) {
+        User user = userRepository.getUserByEmail(refreshToken.getEmail());
+        if (user != null) {
+            System.out.println("refresh Token "+refreshToken.getRefreshToken());
+            System.out.println("refresh Token "+user.getRefreshToken());
+            return refreshToken.getRefreshToken().equals(user.getRefreshToken());
+        }
+        return false;
+    }
+
+    @Override
     public boolean existByEmail(String email) {
         return userRepository.existsUsersByEmail(email);
     }

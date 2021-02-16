@@ -9,7 +9,6 @@ import com.example.passin.encryption.ShaHash;
 import com.example.passin.message.DecryptedPasswordResponse;
 import com.example.passin.message.GetPasswordResponse;
 import com.example.passin.message.ResponseMessage;
-import com.example.passin.security.JwtRequestFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
