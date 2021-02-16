@@ -22,7 +22,7 @@ public class CtrMode {
     private byte[] getBytes(byte[] iv, byte[] message, byte[] key) throws Exception {
         byte[] cipherIv;
         if(message.length<16){
-            System.out.println("Message should be atleast 128 bits");
+            System.out.println("Message should be at least 128 bits");
         }
         int length = message.length;
         int n = (length + 15)/16*16;
@@ -58,10 +58,10 @@ public class CtrMode {
         return cipher;
     }
 
-    public static byte[] increment(byte[] a) {
+    public static void increment(byte[] a) {
         for (int i = a.length - 1; i >= 0; --i) {
             if (++a[i] != 0) {
-                return a;
+                return;
             }
         }
         throw new IllegalStateException("Counter overflow");

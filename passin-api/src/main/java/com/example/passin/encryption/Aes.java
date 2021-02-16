@@ -26,17 +26,15 @@ public class Aes {
 
     public AesEncryptResponse encrypt(byte[] plainText,byte[] key) throws Exception {
         byte[] iv = createIvVector();
-        byte[] plainTextByteArray = plainText;
+        byte[] originalIv = iv.clone();
         AesEncryptResponse aesEncryptResponse = new AesEncryptResponse();
-        aesEncryptResponse.setIv(iv);
-        byte[] cipherTextByteArray = ctrMode.encrypt(iv,plainTextByteArray,key);
+        aesEncryptResponse.setIv(originalIv);
+        byte[] cipherTextByteArray = ctrMode.encrypt(iv,plainText,key);
         aesEncryptResponse.setCipherText(cipherTextByteArray);
         return aesEncryptResponse;
     }
 
     public byte[] decrypt(byte[] cipherText,byte[] key,byte[] iv) throws Exception {
-        byte[] cipherTextByteArray = cipherText;
-        byte[] plainTextByteArray = ctrMode.decrypt(iv,cipherTextByteArray,key);
-        return plainTextByteArray;
+        return ctrMode.decrypt(iv,cipherText,key);
     }
 }

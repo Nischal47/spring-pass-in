@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Word {
     private byte[] word;
-    private AesUtils aesUtils = new AesUtils();
+    private final AesUtils aesUtils = new AesUtils();
 
     public Word() {
         word = new byte[4];
@@ -56,7 +56,7 @@ public class Word {
             byte a = in[i];
             int row = ( a >> 4 ) & 0x000F;
             int col = a & 0x000F;
-            out[i] = (byte) aesUtils.sBox[row * 16 + col];
+            out[i] = (byte) AesUtils.sBox[row * 16 + col];
         }
         for (int i = 0 ; i < 4 ; i++) {
             this.word[i] = out[i];
@@ -76,6 +76,6 @@ public class Word {
     }
 
     public String toString() {
-        return aesUtils.bytesToHex(this.getWord());
+        return AesUtils.bytesToHex(this.getWord());
     }
 }

@@ -59,7 +59,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         httpSecurity.cors().and().csrf().disable().headers().and()
                 .authorizeRequests()
-                .antMatchers("/api/users/register","/api/users/login","/api/users/token-validate").permitAll()
+                .antMatchers("/api/users/register","/api/users/login","/api/users/token-validate","/api/users/refresh-token").permitAll()
                 .antMatchers("/").hasAnyAuthority("ADMIN")
                 .antMatchers("**/save").hasAnyAuthority("ADMIN")
                 .antMatchers("**/edit").hasAnyAuthority("ADMIN")
