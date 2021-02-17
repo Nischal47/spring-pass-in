@@ -111,23 +111,20 @@ public class UserResource {
         return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping("/refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDto refreshTokenDto){
         boolean isValidRefreshToken = userService.validateRefreshToken(refreshTokenDto);
         if(isValidRefreshToken){
             User user = userService.findByEmail(refreshTokenDto.getEmail());
-            final String refreshToken = jwtTokenUtil.generateToken(refreshTokenDto.getEmail(),user.getId());
-            updateRefreshToken(refreshToken,user.getId());
-            return ResponseEntity.ok().body(new RefreshTokenResponseDto(HttpStatus.OK,refreshToken));
+            final String token = jwtTokenUtil.generateToken(refreshTokenDto.getEmail(),user.getId());
+            return ResponseEntity.ok().body(new RefreshTokenResponseDto(HttpStatus.OK,token));
         }
         return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
     }
 
-    @PutMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody LogoutDto logoutDto){
-        System.out.println(logoutDto.getEmail());
         boolean isUser = userService.existByEmail(logoutDto.getEmail());
-        System.out.println(isUser);
         if(isUser){
             User user = userService.findByEmail(logoutDto.getEmail());
             updateRefreshToken("",user.getId());

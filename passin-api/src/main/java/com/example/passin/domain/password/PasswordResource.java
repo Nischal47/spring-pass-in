@@ -8,10 +8,11 @@ import com.example.passin.encryption.AesEncryptResponse;
 import com.example.passin.encryption.ShaHash;
 import com.example.passin.message.DecryptedPasswordResponse;
 import com.example.passin.message.GetPasswordResponse;
+import com.example.passin.message.RandomPasswordResponseMessage;
 import com.example.passin.message.ResponseMessage;
+import com.example.passin.passwordGenerator.PasswordGeneratorUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,21 +32,19 @@ import java.util.Optional;
 public class PasswordResource {
     public static final String PASSWORD_RESOURCE_URL = "/passwords";
 
-    private final PasswordMapper passwordMapper;
     private final PasswordService passwordService;
     private final Aes aes;
     private final UserService userService;
     private final ShaHash shaHash;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordGeneratorUtil passwordGeneratorUtil;
 
     @Inject
-    public PasswordResource(PasswordMapper passwordMapper, PasswordService passwordService, Aes aes, UserService userService, ShaHash shaHash, PasswordEncoder passwordEncoder) {
-        this.passwordMapper = passwordMapper;
+    public PasswordResource(PasswordService passwordService, Aes aes, UserService userService, ShaHash shaHash, PasswordGeneratorUtil passwordGeneratorUtil) {
         this.passwordService = passwordService;
         this.aes = aes;
         this.userService = userService;
         this.shaHash = shaHash;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordGeneratorUtil = passwordGeneratorUtil;
     }
 
     @PostMapping("/save-password")
@@ -72,6 +71,12 @@ public class PasswordResource {
         return ResponseEntity.ok().body(new GetPasswordResponse(passwordList,"Password Retrieved Successfully", HttpStatus.OK));
     }
 
+    @GetMapping("/generate-random-password")
+    public ResponseEntity<RandomPasswordResponseMessage> generateRandomPassword(@RequestBody RandomPasswordGenerationDto randomPasswordGenerationDto){
+        String randomPassword = passwordGeneratorUtil.generateRandomPassword(randomPasswordGenerationDto.getMinLength(), randomPasswordGenerationDto.getMaxLength());
+        return ResponseEntity.ok().body(new RandomPasswordResponseMessage("Random Password Generated Successfully",randomPassword,HttpStatus.OK));
+    }
+
     @GetMapping("/decrypt-password")
     public ResponseEntity<DecryptedPasswordResponse> decryptPassword(@RequestBody GetPasswordDto getPasswordDto) throws Exception {
         Password password = passwordService.findPasswordById(getPasswordDto.getPasswordId());
@@ -93,8 +98,7 @@ public class PasswordResource {
         byte[] iv = user.getIv();
         byte[] masterPassword = user.getMasterPassword();;
         byte[] masterKey = aes.decrypt(masterPassword,hashedPassword,iv);
-        AesEncryptResponse aesEncryptResponse = aes.encrypt(plainTextByteArray,masterKey);
-        return aesEncryptResponse;
+        return aes.encrypt(plainTextByteArray,masterKey);
     }
 
     private String decryptPassword(String cipherText, String originalPassword, long userId, byte[] passwordIv) throws Exception {
