@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 public class RefreshTokenResponseDto {
-    private String refreshToken;
+    private String token;
     private HttpStatus httpStatus;
 
-    public RefreshTokenResponseDto(HttpStatus httpStatus,String refreshToken) {
-        this.refreshToken = refreshToken;
+    public RefreshTokenResponseDto(HttpStatus httpStatus,String token) {
+        this.token = token;
         this.httpStatus = httpStatus;
     }
 }
