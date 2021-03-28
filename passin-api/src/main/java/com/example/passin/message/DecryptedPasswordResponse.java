@@ -1,5 +1,6 @@
 package com.example.passin.message;
 
+import com.example.passin.domain.password.PasswordDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
@@ -7,11 +8,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 public class DecryptedPasswordResponse {
-    private String plainPassword;
+    private String message;
+    private PasswordDto decryptedPassword;
     private HttpStatus httpStatus;
 
-    public DecryptedPasswordResponse(String plainPassword,HttpStatus httpStatus) {
-        this.plainPassword = plainPassword;
+    public DecryptedPasswordResponse(String message, PasswordDto passwordDto,HttpStatus httpStatus) {
+        this.message = message;
+        this.decryptedPassword = passwordDto;
         this.httpStatus = httpStatus;
     }
 }
