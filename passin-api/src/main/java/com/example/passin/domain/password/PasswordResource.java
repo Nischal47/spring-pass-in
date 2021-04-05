@@ -2,20 +2,18 @@ package com.example.passin.domain.password;
 
 import com.example.base.BaseResource;
 import com.example.passin.domain.user.User;
-import com.example.passin.domain.user.UserDto;
 import com.example.passin.domain.user.UserService;
 import com.example.passin.encryption.Aes;
 import com.example.passin.encryption.AesEncryptResponse;
 import com.example.passin.encryption.ShaHash;
 import com.example.passin.message.DecryptedPasswordResponse;
 import com.example.passin.message.GetPasswordResponse;
-import com.example.passin.message.LoginResponseDto;
 import com.example.passin.message.RandomPasswordResponseMessage;
 import com.example.passin.message.ResponseMessage;
-import com.example.passin.message.ResponseUserDto;
 import com.example.passin.passwordGenerator.PasswordGeneratorUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +62,7 @@ public class PasswordResource {
             Password addedPassword = addNewPassword(newPassword);
 
             if(addedPassword.getId() > 0){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Password successfully updated", HttpStatus.OK));
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Password successfully updated", HttpStatus.OK));
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Something went wrong!",HttpStatus.INTERNAL_SERVER_ERROR));
         }
@@ -73,9 +71,18 @@ public class PasswordResource {
 
     @GetMapping("/get-passwords")
     public ResponseEntity<GetPasswordResponse> getAllPassword(@RequestParam(name = "user-id") long id, @RequestHeader("Authorization") String authorization){
-        System.out.println(getJwt(authorization));
         List<Password> passwordList = passwordService.findPasswordByUserId(id);
         return ResponseEntity.ok().body(new GetPasswordResponse(passwordList,"Password Retrieved Successfully", HttpStatus.OK));
+    }
+
+    @PostMapping("/delete-password")
+    public ResponseEntity<ResponseMessage> deletePassword(@RequestBody DeletePasswordDto deletePasswordDto){
+        boolean isValidUser = validateUser(deletePasswordDto.getUserId(),deletePasswordDto.getOriginalPassword());
+        if(isValidUser){
+            passwordService.delete(deletePasswordDto.getPasswordId());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Password Deleted Successfully",HttpStatus.OK));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Password does not match",HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     @GetMapping("/generate-random-password")

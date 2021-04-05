@@ -21,7 +21,6 @@ public class PasswordGeneratorUtil {
         int lCaseCount = secureRandom.nextInt((passwordLength - digitCount - 4) - 2 + 1) + 2;
         int uCaseCount = secureRandom.nextInt((passwordLength - digitCount - lCaseCount - 2) - 2 + 1) + 2;
         int symbolCount = secureRandom.nextInt((passwordLength - digitCount - lCaseCount - uCaseCount) - 2 + 1) + 2;
-
         return generatePassword(digitCount,lCaseCount,uCaseCount,symbolCount);
 
     }
