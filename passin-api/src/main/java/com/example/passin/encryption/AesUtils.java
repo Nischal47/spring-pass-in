@@ -12,7 +12,7 @@ public class AesUtils {
     private static final int NO_OF_WORDS_IN_KEY = 60;
     private static final int KEY_LENGTH = 32;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    private byte[] word;
+    private byte[] word  = new byte[NO_OF_WORDS_IN_KEY];;
     int[] RC = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB, 0x4D, 0x9A};
     Word[] Rcon = new Word[ROUNDS];
 
@@ -26,7 +26,6 @@ public class AesUtils {
             temp[3] = 0;
             Rcon[i].setWord(temp);
         }
-        word = new byte[NO_OF_WORDS_IN_KEY];
     }
 
     static final int[] sBox = {
@@ -49,15 +48,13 @@ public class AesUtils {
     };
 
     private byte[] getRoundKey(int round) {
-        byte[] out;
-        out = Arrays.copyOfRange(word, 16 * round, 16 * round + 16);
-        return out;
+        return Arrays.copyOfRange(word, 16 * round, 16 * round + 16);
     }
 
-    public byte[] XORBytes(byte[] in1, byte[] in2) {
-        byte[] out = new byte[in1.length];
-        for (int i = 0; i < in1.length; i++) {
-            out[i] = (byte) ((in1[i] ^ in2[i]) & 0xff);
+    public byte[] XOR(byte[] a, byte[] b) {
+        byte[] out = new byte[a.length];
+        for (int i = 0; i < a.length; i++) {
+            out[i] = (byte) ((a[i] ^ b[i]) & 0xff);
         }
         return out;
     }
@@ -113,7 +110,7 @@ public class AesUtils {
     }
 
     /* Substitute Bytes */
-    private byte[] subBytes(byte[] in) {
+    private byte[] substituteBytes(byte[] in) {
         byte[] out = new byte[BITS];
         for (int i = 0 ; i < BITS ; i++) {
             byte a = in[i];
@@ -213,23 +210,22 @@ public class AesUtils {
 
     public byte[] encryptText(byte[] plainText, byte[] key) throws Exception {
         setRcon();
-        byte[] cipher;
         this.word = expandKey(key);
         byte[] roundKey = getRoundKey(0);
-        cipher = XORBytes(plainText, roundKey);
+        byte[] cipher = XOR(plainText, roundKey);
 
         for (int i = 1; i < ROUNDS; i++) {
-            cipher = subBytes(cipher);
+            cipher = substituteBytes(cipher);
             cipher = shiftRows(cipher);
             cipher = mixColumns(cipher);
             roundKey = getRoundKey(i);
-            cipher = XORBytes(cipher, roundKey);
+            cipher = XOR(cipher, roundKey);
         }
 
-        cipher = subBytes(cipher);
+        cipher = substituteBytes(cipher);
         cipher = shiftRows(cipher);
         roundKey = getRoundKey(ROUNDS);
-        cipher = XORBytes(cipher, roundKey);
+        cipher = XOR(cipher, roundKey);
         return cipher;
     }
 }

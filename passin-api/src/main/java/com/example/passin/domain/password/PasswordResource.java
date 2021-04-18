@@ -100,7 +100,7 @@ public class PasswordResource {
     @GetMapping("/generate-random-password")
     public ResponseEntity<RandomPasswordResponseMessage> generateRandomPassword(@RequestBody RandomPasswordGenerationDto randomPasswordGenerationDto){
         String randomPassword = passwordGeneratorUtil.generateRandomPassword(randomPasswordGenerationDto.getMinLength(), randomPasswordGenerationDto.getMaxLength());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new RandomPasswordResponseMessage("Random Password Generated Successfully",randomPassword,HttpStatus.UNAUTHORIZED));
+        return ResponseEntity.status(HttpStatus.OK).body(new RandomPasswordResponseMessage("Random Password Generated Successfully",randomPassword,HttpStatus.UNAUTHORIZED));
     }
 
     @PostMapping("/decrypt-password")
@@ -141,7 +141,7 @@ public class PasswordResource {
         byte[] hashedPassword = shaHash.hashBySha(originalPassword);
         User user = userService.getUserById(userId);
         byte[] iv = user.getIv();
-        byte[] masterPassword = user.getMasterPassword();;
+        byte[] masterPassword = user.getMasterPassword();
         byte[] masterKey = aes.decrypt(masterPassword,hashedPassword,iv);
         return aes.encrypt(plainTextByteArray,masterKey);
     }

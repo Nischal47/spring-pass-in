@@ -12,14 +12,13 @@ import com.example.passin.message.ResponseUserDto;
 import com.example.passin.message.SignUpResponseDto;
 import com.example.passin.message.TokenValidationResponse;
 import com.example.passin.message.ValidTokenDtoResponse;
-import com.example.passin.security.JwtTokenUtils;
+import com.example.passin.security.JwtTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,16 +35,16 @@ public class UserResource {
     public static final String USER_RESOURCE_URL = "/users";
 
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtils jwtTokenUtil;
+    private final JwtTokenService tokenService;
     private final UserService userService;
     private final UserMapper userMapper;
     private final Aes aes;
     private final ShaHash shaHash;
 
     @Inject
-    public UserResource(PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtil, UserService userService, UserMapper userMapper, Aes aes, ShaHash shaHash) {
+    public UserResource(PasswordEncoder passwordEncoder, JwtTokenService tokenService, UserService userService, UserMapper userMapper, Aes aes, ShaHash shaHash) {
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenUtil = jwtTokenUtil;
+        this.tokenService = tokenService;
         this.userService = userService;
         this.userMapper = userMapper;
         this.aes = aes;
@@ -57,49 +56,58 @@ public class UserResource {
         if (registerInfo.getEmail().length() == 0 || registerInfo.getPassword().length() == 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SignUpResponseDto("Failed", "Email and password are mandatory!", HttpStatus.BAD_REQUEST));
         }
-        if (!userExist(registerInfo.getEmail())) {
+        if (!userExists(registerInfo.getEmail())) {
             byte[] randomMasterPassword = generateRandomMasterPassword();
             byte[] hashedPassword = shaHash.hashBySha(registerInfo.getPassword());
             AesEncryptResponse aesEncryptResponse = aes.encrypt(randomMasterPassword,hashedPassword);
-            User newUser = new User();
-            newUser.setEmail(registerInfo.getEmail());
-            newUser.setPassword(passwordEncoder.encode(registerInfo.getEmail() + registerInfo.getPassword()));
-            newUser.setFirstName(registerInfo.getFirstName());
-            newUser.setLastName(registerInfo.getLastName());
-            newUser.setDateOfBirth(registerInfo.getDateOfBirth());
-            newUser.setMasterPassword(aesEncryptResponse.getCipherText());
-            newUser.setIv(aesEncryptResponse.getIv());
-            User addedUser = addNewUser(newUser);
-            if (addedUser.getId() > 0) {
+            User user = dtoToUser(registerInfo, aesEncryptResponse);
+            User savedUser = addNewUser(user);
+            if (savedUser.getId() > 0) {
                 return ResponseEntity.status(HttpStatus.OK).body(new SignUpResponseDto("Success", "Registration Successful", HttpStatus.OK));
             }
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignUpResponseDto("Failed", "Account Already Exists!", HttpStatus.CONFLICT));
     }
 
+    private User dtoToUser(RegisterDto registerInfo, AesEncryptResponse aesEncryptResponse) {
+        User newUser = new User();
+        newUser.setEmail(registerInfo.getEmail());
+        newUser.setPassword(passwordEncoder.encode(registerInfo.getEmail() + registerInfo.getPassword()));
+        newUser.setFirstName(registerInfo.getFirstName());
+        newUser.setLastName(registerInfo.getLastName());
+        newUser.setDateOfBirth(registerInfo.getDateOfBirth());
+        newUser.setMasterPassword(aesEncryptResponse.getCipherText());
+        newUser.setIv(aesEncryptResponse.getIv());
+        return newUser;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticateUser(@RequestBody LoginDto loginDto) {
         boolean isValid = userService.validateUser(loginDto);
-        LoginResponseDto loginResponseDto = new LoginResponseDto();
         if (isValid) {
             UserDto user = userMapper.toDto(userService.findByEmail(loginDto.getEmail()));
-            ResponseUserDto responseUserDto = new ResponseUserDto();
-            responseUserDto.setId(user.getId());
-            responseUserDto.setEmail(user.getEmail());
-            responseUserDto.setFirstName(user.getFirstName());
-            responseUserDto.setLastName(user.getLastName());
-            responseUserDto.setDateOfBirth(user.getDateOfBirth());
-            loginResponseDto.setUser(responseUserDto);
-            final String token = jwtTokenUtil.generateToken(loginDto.getEmail(),user.getId());
-            final String refreshToken = jwtTokenUtil.generateRefreshToken(loginDto.getEmail(),user.getId());
+            final String token = tokenService.generateToken(loginDto.getEmail(),user.getId());
+            final String refreshToken = tokenService.generateRefreshToken(loginDto.getEmail(),user.getId());
             updateRefreshToken(refreshToken,user.getId());
-            loginResponseDto.setRefreshToken(refreshToken);
-            loginResponseDto.setMessage("Success");
-            loginResponseDto.setToken(token);
-            return ResponseEntity.ok().body(loginResponseDto);
+            return ResponseEntity.ok().body(toLoginResponseDto(user, token, refreshToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDto(null, "Email or password Invalid", null,null));
         }
+    }
+
+    private LoginResponseDto toLoginResponseDto(UserDto user, String token, String refreshToken) {
+        ResponseUserDto responseUserDto = new ResponseUserDto();
+        responseUserDto.setId(user.getId());
+        responseUserDto.setEmail(user.getEmail());
+        responseUserDto.setFirstName(user.getFirstName());
+        responseUserDto.setLastName(user.getLastName());
+        responseUserDto.setDateOfBirth(user.getDateOfBirth());
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+        loginResponseDto.setUser(responseUserDto);
+        loginResponseDto.setRefreshToken(refreshToken);
+        loginResponseDto.setMessage("Success");
+        loginResponseDto.setToken(token);
+        return loginResponseDto;
     }
 
     @GetMapping("/token-validate")
@@ -116,7 +124,7 @@ public class UserResource {
         boolean isValidRefreshToken = userService.validateRefreshToken(refreshTokenDto);
         if(isValidRefreshToken){
             User user = userService.findByEmail(refreshTokenDto.getEmail());
-            final String token = jwtTokenUtil.generateToken(refreshTokenDto.getEmail(),user.getId());
+            final String token = tokenService.generateToken(refreshTokenDto.getEmail(),user.getId());
             return ResponseEntity.ok().body(new RefreshTokenResponseDto(HttpStatus.OK,token));
         }
         return ResponseEntity.badRequest().body(new ResponseMessage("Link has expired!!", HttpStatus.BAD_REQUEST));
@@ -134,8 +142,8 @@ public class UserResource {
     }
 
     private ValidTokenDtoResponse validTokenResponse(String token) {
-        if (token != null && jwtTokenUtil.validateJwtToken(token)) {
-            String email = jwtTokenUtil.getEmailFromToken(token);
+        if (token != null && tokenService.validateJwtToken(token)) {
+            String email = tokenService.getEmailFromToken(token);
             if (userService.existByEmail(email)) {
                 User user = userService.findByEmail(email);
                 ValidTokenDtoResponse response = new ValidTokenDtoResponse(user.getEmail());
@@ -145,7 +153,7 @@ public class UserResource {
         return null;
     }
 
-    public boolean userExist(String email) {
+    public boolean userExists(String email) {
         return userService.existByEmail(email);
     }
 
