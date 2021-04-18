@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private static Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     @Autowired
-    private JwtTokenUtils jwtTokenUtil;
+    private JwtTokenService jwtTokenUtil;
 
     @Autowired
     @Qualifier(value = "userRepository")

@@ -69,6 +69,18 @@ public class PasswordResource {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Password does not match",HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    @PostMapping("/update-password")
+    public ResponseEntity<ResponseMessage> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto) throws Exception {
+        boolean isValidUser = validateUser(updatePasswordDto.getUserId(),updatePasswordDto.getOriginalPassword());
+        if (isValidUser) {
+            Password password = passwordService.findPasswordById(updatePasswordDto.getPasswordId());
+            AesEncryptResponse aesEncryptResponse = encryptPassword(updatePasswordDto.getPassword(),updatePasswordDto.getOriginalPassword(),updatePasswordDto.getUserId());
+            updatePassword(password,(new String(aesEncryptResponse.getCipherText(),StandardCharsets.ISO_8859_1)),aesEncryptResponse.getIv());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Password successfully updated", HttpStatus.OK));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Password does not match",HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
     @GetMapping("/get-passwords")
     public ResponseEntity<GetPasswordResponse> getAllPassword(@RequestParam(name = "user-id") long id, @RequestHeader("Authorization") String authorization){
         List<Password> passwordList = passwordService.findPasswordByUserId(id);
@@ -88,7 +100,7 @@ public class PasswordResource {
     @GetMapping("/generate-random-password")
     public ResponseEntity<RandomPasswordResponseMessage> generateRandomPassword(@RequestBody RandomPasswordGenerationDto randomPasswordGenerationDto){
         String randomPassword = passwordGeneratorUtil.generateRandomPassword(randomPasswordGenerationDto.getMinLength(), randomPasswordGenerationDto.getMaxLength());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new RandomPasswordResponseMessage("Random Password Generated Successfully",randomPassword,HttpStatus.UNAUTHORIZED));
+        return ResponseEntity.status(HttpStatus.OK).body(new RandomPasswordResponseMessage("Random Password Generated Successfully",randomPassword,HttpStatus.UNAUTHORIZED));
     }
 
     @PostMapping("/decrypt-password")
@@ -116,12 +128,20 @@ public class PasswordResource {
         return passwordService.save(password);
     }
 
+    public void updatePassword(Password password, String newPassword,byte[] Iv) {
+        password.setPassword(newPassword);
+        password.setIv(Iv);
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        password.setUpdatedOn(currentTimestamp);
+        this.passwordService.update(password);
+    }
+
     private AesEncryptResponse encryptPassword(String plainText, String originalPassword, long userId) throws Exception {
         byte[] plainTextByteArray = plainText.getBytes(StandardCharsets.ISO_8859_1);
         byte[] hashedPassword = shaHash.hashBySha(originalPassword);
         User user = userService.getUserById(userId);
         byte[] iv = user.getIv();
-        byte[] masterPassword = user.getMasterPassword();;
+        byte[] masterPassword = user.getMasterPassword();
         byte[] masterKey = aes.decrypt(masterPassword,hashedPassword,iv);
         return aes.encrypt(plainTextByteArray,masterKey);
     }

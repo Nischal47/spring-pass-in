@@ -30,7 +30,7 @@ public class CtrMode {
 
         if(length == 16){
             cipherIv =  aesUtils.encryptText(iv,key);
-            cipher = aesUtils.XORBytes(cipherIv,message);
+            cipher = aesUtils.XOR(cipherIv,message);
             return cipher;
         }
 
@@ -49,7 +49,7 @@ public class CtrMode {
             }
 
             cipherIv =  aesUtils.encryptText(iv,key);
-            result = aesUtils.XORBytes(cipherIv,block);
+            result = aesUtils.XOR(cipherIv,block);
             for (j = 0 ; j < 16 && k < cipher.length; j++, k++) {
                 cipher[k] = result[j];
             }
