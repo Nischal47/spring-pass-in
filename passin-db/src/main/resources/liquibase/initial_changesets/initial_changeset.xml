@@ -92,4 +92,24 @@
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
+    <changeSet id="usedPassword" author="Nischal">
+        <createTable tableName="used_passwords">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="used_password_pkey"/>
+            </column>
+            <column name="passwords" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="used-password-foreign-key" author="Nischal">
+        <addForeignKeyConstraint baseTableName="used_passwords"
+                                 baseColumnNames="user_id"
+                                 constraintName="used_password_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
 </databaseChangeLog>
