@@ -1,7 +1,6 @@
 package com.example.passin.domain.usedPassword;
 
 import com.example.base.BaseRepository;
-import com.example.passin.domain.password.Password;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
