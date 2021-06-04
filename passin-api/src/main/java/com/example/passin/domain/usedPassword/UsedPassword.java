@@ -11,10 +11,10 @@ import javax.persistence.Table;
 @Entity
 @Getter
 @Setter
-@Table(name = "used-password",schema = "public")
+@Table(name = "used_passwords",schema = "public")
 public class UsedPassword extends BaseEntity {
 
-    @Column(name = "password")
+    @Column(name = "passwords")
     private String password;
 
     @Column(name = "user_id")
