@@ -113,7 +113,7 @@ public class PasswordResource {
     }
 
     @GetMapping("/generate-random-password")
-    public ResponseEntity<RandomPasswordResponseMessage> generateRandomPassword(@RequestParam(name = "minLength") int minLength,@RequestParam(name = "minLength") int maxLength) {
+    public ResponseEntity<RandomPasswordResponseMessage> generateRandomPassword(@RequestParam(name = "minLength") int minLength, @RequestParam(name = "minLength") int maxLength) {
         String randomPassword = passwordGeneratorUtil.generateRandomPassword(minLength, maxLength);
         return ResponseEntity.status(HttpStatus.OK).body(new RandomPasswordResponseMessage("Random Password Generated Successfully", randomPassword, HttpStatus.UNAUTHORIZED));
     }
@@ -187,6 +187,7 @@ public class PasswordResource {
         UsedPassword newPassword = new UsedPassword();
         newPassword.setPassword(passwordEncoder.encode(password));
         newPassword.setUserId(userId);
+        usedPasswordService.save(newPassword);
     }
 
 }
